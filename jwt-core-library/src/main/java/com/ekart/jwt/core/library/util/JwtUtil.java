@@ -3,16 +3,23 @@ package com.ekart.jwt.core.library.util;
 import com.ekart.jwt.core.library.model.UserDetails;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.Objects;
 
 public class JwtUtil {
-  private final String secretKey;
+
+  private final Key secretKey;
   private final long tokenValidityInMs;
 
   public JwtUtil(String secretKey, long tokenValidityInMs) {
-    this.secretKey = secretKey;
+    if (secretKey == null || secretKey.length() < 32) {
+      throw new IllegalArgumentException("Secret key must be at least 256 bits (32 chars base64).");
+    }
+    this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     this.tokenValidityInMs = tokenValidityInMs;
   }
 
